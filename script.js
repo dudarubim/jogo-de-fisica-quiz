@@ -19,6 +19,10 @@ const LB_KEY = "physics_quiz_leaderboard_v3";
 const LAST_Q_KEY = "physics_quiz_last_questions_v3";
 
 let playerName = "", questions = [], currentIndex = 0, score = 0, timeLeft = 30, timerInterval = null;
+// NOVAS VARIÁVEIS ADICIONADAS
+let errosDoJogador = []; 
+const btnMostrarErros = document.getElementById("btnMostrarErros");
+
 
 // 🧠 Banco de perguntas
 const questionPool = [
@@ -72,6 +76,8 @@ startBtn.onclick = () => {
   questions = pickQuestions(10);
   currentIndex = 0;
   score = 0;
+  errosDoJogador = []; // <-- ADICIONADO: Limpa os erros do jogo anterior
+    startScreen.classList.add("hidden");
   startScreen.classList.add("hidden");
   gameOverScreen.classList.add("hidden");
   gameScreen.classList.remove("hidden");
@@ -125,6 +131,14 @@ nextBtn.onclick = () => {
 function showResult(){
   gameScreen.classList.add("hidden");
   resultScreen.classList.remove("hidden");
+
+  if(errosDoJogador.length > 0) {
+        btnMostrarErros.classList.remove("hidden");
+        btnMostrarErros.onclick = mostrarErros;
+    } else {
+        btnMostrarErros.classList.add("hidden");
+    }
+    document.getElementById('listaErros').innerHTML = '';
 
   if(score === questions.length){
     scoreText.innerHTML = `
@@ -189,3 +203,58 @@ function startConfetti(){
   },100);
 }
 function stopConfetti(){ clearInterval(confettiInterval); }
+
+function answer(i){
+    clearInterval(timerInterval);
+    const q = questions[currentIndex]; // Pergunta atual
+    const correct = q.a; // Índice da resposta correta
+    
+    // NOVO: Lógica de registro de erro
+    if(i !== correct) {
+        errosDoJogador.push({
+            pergunta: q.q,
+            respostaCorreta: q.opts[correct], // A string da resposta correta
+            respostaDoJogador: q.opts[i] // A string da resposta do jogador
+        });
+    }
+
+    Array.from(optionsList.children).forEach((b, idx)=>{
+        b.disabled = true;
+        if(idx === correct) b.classList.add("correct");
+        if(idx === i && i !== correct) b.classList.add("wrong");
+    });
+    if(i === correct) score++;
+    nextBtn.classList.remove("hidden");
+}
+
+// NOVO: Função para exibir a lista de perguntas erradas
+function mostrarErros(){
+    const listaErrosDiv = document.getElementById('listaErros');
+    // Alterna a exibição da lista
+    if (listaErrosDiv.innerHTML !== '') {
+        listaErrosDiv.innerHTML = '';
+        btnMostrarErros.textContent = "Mostrar Perguntas Erradas ❌";
+        return;
+    }
+    
+    btnMostrarErros.textContent = "Esconder Lista de Erros ▲";
+
+    if (errosDoJogador.length === 0) {
+        listaErrosDiv.innerHTML = '<p>🎉 **Parabéns! Você não cometeu erros.**</p>';
+        return;
+    }
+
+    errosDoJogador.forEach(erro => {
+        const erroItem = document.createElement('div');
+        erroItem.classList.add('erro-item');
+        erroItem.innerHTML = `
+            <p><strong>❓ Pergunta:</strong> ${erro.pergunta}</p>
+            <p><strong>⛔ Sua Resposta:</strong> ${erro.respostaDoJogador}</p>
+            <p><strong>✅ Resposta Correta:</strong> ${erro.respostaCorreta}</p>
+        `;
+        listaErrosDiv.appendChild(erroItem);
+    });
+}
+
+
+
