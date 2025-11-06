@@ -99,7 +99,7 @@ th, td {
 /* --- ESTILO PARA O PAPEL DE PAREDE E LEGIBILIDADE --- */
 body {
     /* Imagem de fundo de física (fórmulas) */
-    background-image:image('./foto.png'); 
+    background-image:url('./img/foto.png'); 
     background-size: cover; 
     background-attachment: fixed; 
     background-position: center; 
