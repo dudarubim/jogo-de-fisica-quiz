@@ -78,6 +78,18 @@ th, td {
   text-align: left;
   border-bottom: 1px dashed rgba(255,255,255,0.1);
 }
+/* Aplica um fundo a cada linha ímpar (se desejar) */
+tr:nth-child(odd) {
+  background-color: #9c9993;
+}
+
+
+/* Aplica um fundo  linha par */
+tr:nth-child(even) {
+  background-color: #097bc7;
+}
+
+
 
 .confetti{
   position:fixed;
@@ -154,4 +166,3 @@ body {
 .erro-item strong {
     color: #ff6666; /* Cor de destaque para o texto do erro */
 }
-
